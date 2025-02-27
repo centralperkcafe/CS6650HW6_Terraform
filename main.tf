@@ -276,17 +276,17 @@ data "template_file" "userdata" {
   template = <<-EOF
     #!/bin/bash
     # Update and install Docker
-    yum update -y
-    amazon-linux-extras install docker -y
-    systemctl enable docker
-    systemctl start docker
+    sudo yum update -y
+    sudo amazon-linux-extras install docker -y
+    sudo systemctl enable docker
+    sudo systemctl start docker
 
     # Pull your Docker Hub image (matching the name from CI)
-    docker pull ${var.dockerhub_username}/go-server:latest
+    sudo docker pull ${var.dockerhub_username}/go-server:latest
 
     # Run container mapping container port 8080 to host port 8080
     Environment="DB_DSN=${var.db_username}:${var.db_password}@tcp(${aws_db_instance.mysql_demo.address}:3306)/${aws_db_instance.mysql_demo.db_name}"
-    docker run -d -p 8080:8080 --name go-server <DOCKERHUB_USERNAME>/go-server:latest
+    sudo docker run -d -p 8080:8080 --name go-server <DOCKERHUB_USERNAME>/go-server:latest
     EOF
 }
 
