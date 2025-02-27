@@ -28,6 +28,11 @@ variable "ami_id" {
   default = "ami-08e4e35cccc6189f4"
 }
 
+variable "dockerhub_username" {
+  type = string
+  default = "mydockerusername"
+}
+
 # variable "db_dsn" {
 #   type        = string
 #   description = "DSN connection string for the MySQL database"
@@ -270,16 +275,18 @@ resource "aws_lb_listener" "demo_http_listener" {
 data "template_file" "userdata" {
   template = <<-EOF
     #!/bin/bash
-    mkdir -p /etc/systemd/system/go-demo.service.d
-    cat <<EOT > /etc/systemd/system/go-demo.service.d/override.conf
-    [Service]
-    # Construct the DB_DSN string using Terraform references
-    # e.g. "myuser:mypass@tcp(mydb.xxxx.us-west-2.rds.amazonaws.com:3306)/mydemodb"
-    Environment="DB_DSN=${var.db_username}:${var.db_password}@tcp(${aws_db_instance.mysql_demo.address}:3306)/${aws_db_instance.mysql_demo.db_name}"
-    EOT
+    # Update and install Docker
+    yum update -y
+    amazon-linux-extras install docker -y
+    systemctl enable docker
+    systemctl start docker
 
-    systemctl daemon-reload
-    systemctl restart go-demo.service
+    # Pull your Docker Hub image (matching the name from CI)
+    docker pull ${var.dockerhub_username}/go-server:latest
+
+    # Run container mapping container port 8080 to host port 8080
+    Environment="DB_DSN=${var.db_username}:${var.db_password}@tcp(${aws_db_instance.mysql_demo.address}:3306)/${aws_db_instance.mysql_demo.db_name}"
+    docker run -d -p 8080:8080 --name go-server <DOCKERHUB_USERNAME>/go-server:latest
     EOF
 }
 
