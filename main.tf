@@ -285,8 +285,11 @@ data "template_file" "userdata" {
     sudo docker pull ${var.dockerhub_username}/go-server:latest
 
     # Run container mapping container port 8080 to host port 8080
-    Environment="DB_DSN=${var.db_username}:${var.db_password}@tcp(${aws_db_instance.mysql_demo.address}:3306)/${aws_db_instance.mysql_demo.db_name}"
-    sudo docker run -d -p 8080:8080 --name go-server <DOCKERHUB_USERNAME>/go-server:latest
+    sudo docker run -d \
+      -p 8080:8080 \
+      --name go-server \
+      -e DB_DSN="${var.db_username}:${var.db_password}@tcp(${aws_db_instance.mysql_demo.address}:3306)/${aws_db_instance.mysql_demo.db_name}" \
+      ${var.dockerhub_username}/go-server:latest
     EOF
 }
 
