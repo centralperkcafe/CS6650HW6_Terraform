@@ -25,7 +25,7 @@ variable "db_password" {
 
 variable "ami_id" {
   type    = string
-  default = "ami-08e4e35cccc6189f4"
+  default = "ami-097133556d56b9617"
 }
 
 variable "dockerhub_username" {
