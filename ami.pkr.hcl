@@ -67,7 +67,7 @@ build {
       "sudo yum install -y git",
 
       # 4) Clone your Go server code
-      "git clone https://github.com/RuidiH/CS6650HW6_GO /home/ec2-user/go-server",
+      "git clone https://github.com/centralperkcafe/CS6650HW6_GO.git /home/ec2-user/go-server",
       "cd /home/ec2-user/go-server",
 
       # 5) Build the server
