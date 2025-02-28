@@ -236,7 +236,7 @@ resource "aws_lb_target_group" "demo_tg" {
   health_check {
     port                = "traffic-port"
     protocol            = "HTTP"
-    path                = "/count" # The Go app route used for health checks
+    path                = "/health" # The Go app route used for health checks
     matcher             = "200-399"
     healthy_threshold   = 2
     unhealthy_threshold = 2
