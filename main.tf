@@ -275,23 +275,21 @@ resource "aws_lb_listener" "demo_http_listener" {
 data "template_file" "userdata" {
   template = <<-EOF
     #!/bin/bash
-    # Update and install Docker
     sudo yum update -y
     sudo amazon-linux-extras install docker -y
     sudo systemctl enable docker
     sudo systemctl start docker
 
-    # Pull your Docker Hub image (matching the name from CI)
-    sudo docker pull ${var.dockerhub_username}/go-server:latest
+    export DB_DSN="${var.db_username}:${var.db_password}@tcp(${aws_db_instance.mysql_demo.address}:3306)/${aws_db_instance.mysql_demo.db_name}"
 
-    # Run container mapping container port 8080 to host port 8080
     sudo docker run -d \
       -p 8080:8080 \
       --name go-server \
-      -e DB_DSN="${var.db_username}:${var.db_password}@tcp(${aws_db_instance.mysql_demo.address}:3306)/${aws_db_instance.mysql_demo.db_name}" \
+      -e DB_DSN="$DB_DSN" \
       ${var.dockerhub_username}/go-server:latest
-    EOF
+  EOF
 }
+
 
 resource "aws_launch_template" "demo_lt" {
   name_prefix   = "demo-lt-"
